@@ -86,6 +86,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django_extensions",
     "django_vite",
+    "django_htmx",
     "ninja",
     "widget_tweaks",
     "allauth",
@@ -100,6 +101,7 @@ INSTALLED_APPS = [
     "sbomify.apps.billing",
     "sbomify.apps.notifications",
     "sbomify.apps.vulnerability_scanning",
+    "sbomify.apps.onboarding",
     "health_check",
     "health_check.db",
     "anymail",
@@ -111,6 +113,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -121,8 +124,15 @@ MIDDLEWARE = [
 
 
 if DEBUG:
-    INSTALLED_APPS.append("debug_toolbar")
-    MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
+    # Only add debug toolbar if it's available (dev dependencies installed)
+    try:
+        import debug_toolbar  # noqa: F401
+
+        INSTALLED_APPS.append("debug_toolbar")
+        MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
+    except ImportError:
+        # Debug toolbar not available (e.g., in production with DEBUG=True)
+        pass
 
 INTERNAL_IPS = [
     "127.0.0.1",
